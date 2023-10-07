@@ -17,7 +17,7 @@ cstr.color.add_code("error", f"{cstr.color.RED}MyProject {cstr.color.END}Error: 
 #! EXAMPLE USAGE
 cstr("This is a message").msg.print()
 cstr("This is a warning").warning.print()
-cstr("This is a warning").error.print()
+cstr("This is a error").error.print()
 
 #! JUST USE COLOR
 print(f"{cstr.color.RED}Red text{cstr.color.END}")
