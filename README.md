@@ -1,7 +1,11 @@
 # cstr
 Provides a method for printing colored messages to console with preset tags.
 
-Example usage:
+# Installation
+
+`pip install https://github.com/WASasquatch/cstr.git`
+
+# Example usage
 ```python
 from cstr import cstr
 
