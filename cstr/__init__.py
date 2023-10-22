@@ -1,5 +1,4 @@
-
-class cstr(str):
+def cstr_colors():
     class color:
         END = '\33[0m'
         BOLD = '\33[1m'
@@ -44,30 +43,50 @@ class cstr(str):
         LIGHTVIOLETBG = '\33[105m'
         LIGHTBEIGEBG = '\33[106m'
         LIGHTWHITEBG = '\33[107m'
-
+        
         @staticmethod
         def add_code(name, code):
-            if not hasattr(cstr.color, name.upper()):
-                setattr(cstr.color, name.upper(), code)
+            if not hasattr(color, name.upper()):
+                setattr(color, name.upper(), code)
             else:
-                raise ValueError(f"'cstr' object already contains a code with the name '{name}'.")
+                raise ValueError(f"'color' object already contains a code with the name '{name}'.")
+    return color
 
-    def __new__(cls, text):
-        return super().__new__(cls, text)
+class _Cstr(str):        
+    def __new__(cls, text='', color_class=None):
+        instance = super().__new__(cls, text)
+        instance.color = color_class or cstr_colors()
+        return instance
+
 
     def __getattr__(self, attr):
         if attr.lower().startswith("_cstr"):
             code = getattr(self.color, attr.upper().lstrip("_cstr"))
             modified_text = self.replace(f"__{attr[1:]}__", f"{code}")
-            return cstr(modified_text)
+            return _Cstr(modified_text)
         elif attr.upper() in dir(self.color):
             code = getattr(self.color, attr.upper())
             modified_text = f"{code}{self}{self.color.END}"
-            return cstr(modified_text)
-        elif attr.lower() in dir(cstr):
-            return getattr(cstr, attr.lower())
+            return _Cstr(modified_text)
+        elif attr.lower() in dir(_Cstr):
+            return getattr(_Cstr, attr.lower())
         else:
-            raise AttributeError(f"'cstr' object has no attribute '{attr}'")
+            raise AttributeError(f"'_Cstr' object has no attribute '{attr}'")
 
     def print(self, **kwargs):
         print(self, **kwargs)
+
+    def add_code(self, name, code):
+        self.color.add_code(name, code)
+
+class cstr:
+    def __new__(cls, text=''):
+        color_class = cstr_colors()
+        class CstrInstance(_Cstr):
+            def __call__(self, new_text):
+                return CstrInstance(new_text, color_class=color_class)
+        return CstrInstance(text, color_class=color_class)
+
+    @staticmethod
+    def add_code(instance, name, code):
+        instance.add_code(name, code)
